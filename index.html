@@ -82,6 +82,20 @@
       background: #218838;
     }
 
+    /* --- Kết quả --- */
+    #result-img {
+      display: none;
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    #result-img img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
     /* --- Popup Box-up chung --- */
     .popup {
       display: none;
@@ -135,6 +149,11 @@
     <button onclick="openHint()">💡 Gợi ý</button>
   </div>
 
+  <!-- Kết quả -->
+  <div id="result-img">
+    <img id="result-image" src="" alt="Kết quả">
+  </div>
+
   <!-- Popup khi sai -->
   <div class="popup" id="popup">
     <div class="popup-content">
@@ -181,7 +200,7 @@
               "Thông tin người có liên quan: Vũ Hải Yến",
               "Thông tin người có liên quan: Lại Vũ Bình"
             ],
-            correct: [13,14,18] // 3 tài liệu đúng
+            correct: [13,14,18]
           },
           {
             title: "b. Ảnh vụ án",
@@ -190,11 +209,11 @@
               "Ảnh hiện trường",
               "Ảnh người ẩn danh cung cấp"
             ],
-            correct: [0,2] // 2 ảnh đúng
+            correct: [0,2]
           }
         ],
         next: 1,
-        hasHint: true // chỉ câu này có gợi ý
+        hasHint: true
       },
       {
         text: "Câu hỏi 2: Ai là Hung thủ đã giết chết nạn nhân?",
@@ -276,7 +295,11 @@
           current = q.next;
           loadQuestion(current);
         } else if (q.imageLink) {
-          window.location.href = q.imageLink;
+          // Hiển thị ảnh kết quả ngay trên page
+          document.getElementById('quiz').style.display = 'none';
+          document.getElementById('hintButtonContainer').style.display = 'none';
+          document.getElementById('result-img').style.display = 'block';
+          document.getElementById('result-image').src = q.imageLink;
         }
       } else {
         document.getElementById('popup').style.display = 'flex';
@@ -300,5 +323,3 @@
   </script>
 </body>
 </html>
-
-
