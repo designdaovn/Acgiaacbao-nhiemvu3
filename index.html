@@ -136,27 +136,7 @@
   </style>
 </head>
 <body>
-  <div class="quiz-container" id="quiz">
-    <h2>Câu hỏi: Tài liệu nào đã bị làm giả?</h2>
-    <div class="subtitle">Trước khi chọn đáp án, hãy chắc rằng bạn đã tìm ra 2 đặc điểm của tài liệu bị làm giả</div>
-
-    <ul class="answers" id="q1">
-      <li><input type="checkbox" value="0" id="ans0"><label for="ans0">Báo cáo vụ án</label></li>
-      <li><input type="checkbox" value="1" id="ans1"><label for="ans1">Câu hỏi về nạn nhân</label></li>
-      <li><input type="checkbox" value="2" id="ans2"><label for="ans2">Lời khai nhân chứng: Nguyễn Văn Hải</label></li>
-      <li><input type="checkbox" value="3" id="ans3"><label for="ans3">Lời khai nhân chứng: Nguyễn Thị Lan</label></li>
-      <li><input type="checkbox" value="4" id="ans4"><label for="ans4">Lời khai nhân chứng: Nguyễn Nhật Linh</label></li>
-      <li><input type="checkbox" value="5" id="ans5"><label for="ans5">Lời khai nghi phạm: Nguyễn Ngọc</label></li>
-      <li><input type="checkbox" value="6" id="ans6"><label for="ans6">Lời khai nghi phạm:Vũ Hải Yến</label></li>
-      <li><input type="checkbox" value="7" id="ans7"><label for="ans7">Lời khai nghi phạm: Hoàng TIến</label></li>
-      <li><input type="checkbox" value="8" id="ans8"><label for="ans8">Lời khai nghi phạm: Hoàng TIến</label></li>
-      <li><input type="checkbox" value="9" id="ans9"><label for="ans9">Ảnh hiện trường</label></li>
-      <li><input type="checkbox" value="10" id="ans10"><label for="ans10">Giám định mẫu vật</label></li>
-      <li><input type="checkbox" value="11" id="ans11"><label for="ans11">Danh sách cuộc gọi cuối của nạn nhân</label></li>
-    </ul>
-
-    <button onclick="checkAnswers()">Kiểm tra đáp án</button>
-  </div>
+  <div class="quiz-container" id="quiz"></div>
 
   <div id="result-img">
     <img id="result-image" src="" alt="Kết quả">
@@ -166,14 +146,60 @@
   <div class="popup" id="popup">
     <div class="popup-content">
       <span class="popup-close" onclick="closePopup()">×</span>
-      <img src="https://raw.githubusercontent.com/designdaovn/acgiaacbao-nhiemvu2/refs/heads/main/khi%20chon%20dap%20an%20sai.png" alt="Sai rồi">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/No_Cross_Circle.svg/240px-No_Cross_Circle.svg.png" alt="Sai rồi">
     </div>
   </div>
 
   <script>
+    // Danh sách các câu hỏi
+    const questions = [
+      {
+        text: "Câu hỏi: Tài liệu nào đã bị làm giả?",
+        subtitle: "Trước khi chọn đáp án, hãy chắc rằng bạn đã tìm ra 2 đặc điểm của tài liệu bị làm giả",
+        answers: [
+          "Báo cáo vụ án",
+          "Câu hỏi về nạn nhân",
+          "Lời khai nhân chứng: Nguyễn Văn Hải",
+          "Danh sách cuộc gọi cuối của nạn nhân"
+        ],
+        correct: [3], // đáp án đúng
+        next: 1
+      },
+      {
+        text: "Hung khí được tìm thấy ở đâu?",
+        subtitle: "Chọn 1 đáp án duy nhất",
+        answers: [
+          "Trong bếp",
+          "Trong vườn",
+          "Trong gara"
+        ],
+        correct: [1], // đáp án đúng
+        imageLink: "https://github.com/designdaovn/Hosomat-acgiaacbao/raw/main/Gi%E1%BA%A3i%20th%C3%ADch%20m%E1%BB%A5c%20ti%C3%AAu%201.jpeg"
+      }
+    ];
+
+    let current = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      const container = document.getElementById("quiz");
+      container.innerHTML = `
+        <h2>${q.text}</h2>
+        <div class="subtitle">${q.subtitle || ""}</div>
+        <ul class="answers" id="answers">
+          ${q.answers.map((a, i) => `
+            <li>
+              <input type="checkbox" value="${i}" id="ans${i}">
+              <label for="ans${i}">${a}</label>
+            </li>`).join("")}
+        </ul>
+        <button onclick="checkAnswers()">Kiểm tra đáp án</button>
+      `;
+    }
+
     function checkAnswers() {
       let selected = [];
-      document.querySelectorAll('#q1 input[type="checkbox"]:checked').forEach(cb => {
+      document.querySelectorAll('#answers input[type="checkbox"]:checked').forEach(cb => {
         selected.push(parseInt(cb.value));
       });
 
@@ -182,17 +208,17 @@
         return;
       }
 
-      const correct = [11]; // đáp án đúng
-      selected.sort();
+      const q = questions[current];
+      const correct = q.correct;
 
-      if (JSON.stringify(selected) === JSON.stringify(correct)) {
-        // Nếu đúng → ẩn quiz, hiện ảnh kết quả
-        document.getElementById('quiz').style.display = 'none';
-        document.getElementById('result-img').style.display = 'block';
-        document.getElementById('result-image').src =
-          "https://github.com/designdaovn/Hosomat-acgiaacbao/raw/main/Gi%E1%BA%A3i%20th%C3%ADch%20m%E1%BB%A5c%20ti%C3%AAu%201.jpeg";
+      if (JSON.stringify(selected.sort()) === JSON.stringify(correct.sort())) {
+        if (q.next !== undefined) {
+          current = q.next;
+          loadQuestion(current);
+        } else if (q.imageLink) {
+          window.location.href = q.imageLink;
+        }
       } else {
-        // Nếu sai → hiện popup
         document.getElementById('popup').style.display = 'flex';
       }
     }
@@ -200,9 +226,9 @@
     function closePopup() {
       document.getElementById('popup').style.display = 'none';
     }
+
+    // Khởi tạo câu hỏi đầu tiên
+    loadQuestion(current);
   </script>
 </body>
 </html>
-
-
-
